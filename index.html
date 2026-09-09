@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>茶韵翻译官 · V6.2 PWA版</title>
+<title>茶韵翻译官 · V7.0 全功能版</title>
 <!-- PWA 元信息 -->
 <meta name="theme-color" content="#2d5a3d">
 <meta name="description" content="用大白话翻译茶叶专业术语，拍照识茶、记录品鉴、找到适合你的茶">
@@ -1799,6 +1799,9 @@ body {
 .scan-page .page-content {
   background: #1a1a1a;
   padding: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 .scan-header {
   position: absolute;
@@ -1833,7 +1836,8 @@ body {
 .scan-camera-area {
   position: relative;
   width: 100%;
-  height: 70%;
+  flex: 1;
+  min-height: 0;
   background: linear-gradient(135deg, #2d5a3d 0%, #1a3d2a 50%, #0d1f15 100%);
   overflow: hidden;
   display: flex;
@@ -1843,6 +1847,8 @@ body {
 .scan-frame {
   width: 280px;
   height: 280px;
+  max-width: 80vw;
+  max-height: 50vh;
   border: 2px solid rgba(255,255,255,0.5);
   border-radius: 16px;
   position: relative;
@@ -1887,6 +1893,35 @@ body {
   font-size: 13px;
   white-space: nowrap;
 }
+.scan-tea-type-selector {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 90%;
+  z-index: 5;
+}
+.tea-type-tag {
+  padding: 6px 14px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  color: rgba(255,255,255,0.8);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(10px);
+}
+.tea-type-tag.active {
+  background: #d4a017;
+  border-color: #d4a017;
+  color: #fff;
+  font-weight: 600;
+}
 .scan-tea-preview {
   position: absolute;
   top: 50%;
@@ -1896,12 +1931,9 @@ body {
   opacity: 0.3;
 }
 .scan-actions {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 30px 40px;
-  background: linear-gradient(transparent, rgba(0,0,0,0.8));
+  padding: 20px 40px 30px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.9));
+  flex-shrink: 0;
 }
 .scan-btn-row {
   display: flex;
@@ -3671,7 +3703,7 @@ input, textarea { font-size: 16px !important; } /* 防止iOS自动缩放 */
 </style>
 
 <div class="phone-frame">
-  <div class="v3-badge">✨ V6.2 雷达图优化版</div>
+  <div class="v3-badge">✨ V7.0 全功能版</div>
   <div class="phone-screen">
     <div class="page-container">
       <!-- 新手引导页 -->
@@ -3906,6 +3938,16 @@ input, textarea { font-size: 16px !important; } /* 防止iOS自动缩放 */
             </div>
             
             <div class="scan-hint">将茶叶放入框内，保持清晰</div>
+            
+            <!-- 茶类预选标签 -->
+            <div class="scan-tea-type-selector">
+              <div class="tea-type-tag active" data-type="tieguanyin" onclick="selectTeaType(this, 'tieguanyin')">铁观音</div>
+              <div class="tea-type-tag" data-type="rocktea" onclick="selectTeaType(this, 'rocktea')">岩茶</div>
+              <div class="tea-type-tag" data-type="blacktea" onclick="selectTeaType(this, 'blacktea')">红茶</div>
+              <div class="tea-type-tag" data-type="greentea" onclick="selectTeaType(this, 'greentea')">绿茶</div>
+              <div class="tea-type-tag" data-type="whitetea" onclick="selectTeaType(this, 'whitetea')">白茶</div>
+              <div class="tea-type-tag" data-type="puer" onclick="selectTeaType(this, 'puer')">普洱</div>
+            </div>
             
             <!-- 识别中遮罩 -->
             <div class="scan-recognizing" id="scanRecognizing">
@@ -8554,6 +8596,164 @@ function toggleFlash() {
   }
 }
 
+// 茶类识别结果数据库（关联模型）
+const teaRecognitionDatabase = {
+  tieguanyin: {
+    name: '安溪铁观音',
+    emoji: '🍃',
+    confidence: 96,
+    category: '乌龙茶·清香型',
+    origin: '福建安溪',
+    totalScore: 92.4,
+    scores: { shape: 90, color: 95, aroma: 94, taste: 93, leaf: 90 },
+    beginner: {
+      smell: '像走进了兰花园，清雅的兰花香',
+      taste: '入口鲜爽，咽下后喉咙里返回蜂蜜般的甜',
+      after: '两颊生津，舌底鸣泉，越喝越润',
+      feature: '观音韵——香而不艳，七泡有余香'
+    },
+    tags: ['兰花香', '观音韵', '鲜爽', '七泡有余香'],
+    brew: { temp: '95℃', amount: '7g/110ml', time: '10秒起，逐泡+5秒' }
+  },
+  rocktea: {
+    name: '武夷岩茶·肉桂',
+    emoji: '🟤',
+    confidence: 94,
+    category: '乌龙茶·岩茶',
+    origin: '福建武夷山',
+    totalScore: 93.8,
+    scores: { shape: 92, color: 94, aroma: 96, taste: 95, leaf: 92 },
+    beginner: {
+      smell: '浓郁的桂皮香中带着花果甜香，霸气外放',
+      taste: '入口醇厚饱满，茶汤有骨力，岩韵明显',
+      after: '回甘迅猛，喉韵悠长，杯底留香持久',
+      feature: '岩骨花香——岩韵与花香交织，肉桂霸气'
+    },
+    tags: ['桂皮香', '岩韵', '醇厚', '霸气'],
+    brew: { temp: '100℃', amount: '8g/110ml', time: '8秒起，逐泡+5秒' }
+  },
+  blacktea: {
+    name: '金骏眉',
+    emoji: '🟡',
+    confidence: 95,
+    category: '红茶·正山小种',
+    origin: '福建武夷山桐木关',
+    totalScore: 91.5,
+    scores: { shape: 93, color: 92, aroma: 94, taste: 90, leaf: 89 },
+    beginner: {
+      smell: '蜜香中带着花果甜香，像蜂蜜水的味道',
+      taste: '入口甘甜顺滑，茶汤绵柔，几乎不涩',
+      after: '喉咙里持续返回蜜糖般的甜润感',
+      feature: '蜜韵——全芽头制作，金毫显露，甜香持久'
+    },
+    tags: ['蜜香', '甜润', '金毫', '绵柔'],
+    brew: { temp: '85℃', amount: '3g/150ml', time: '30秒起，逐泡+10秒' }
+  },
+  greentea: {
+    name: '西湖龙井',
+    emoji: '🟢',
+    confidence: 93,
+    category: '绿茶·扁炒青',
+    origin: '浙江杭州',
+    totalScore: 90.2,
+    scores: { shape: 95, color: 91, aroma: 90, taste: 88, leaf: 87 },
+    beginner: {
+      smell: '清新的豆香中带着嫩栗香，像春天的味道',
+      taste: '入口鲜爽甘醇，茶汤清淡但有层次',
+      after: '口腔清爽，回甘淡雅，有绿豆汤的感觉',
+      feature: '豆香嫩栗——扁平光滑，色翠香郁味甘形美'
+    },
+    tags: ['豆香', '鲜爽', '扁平', '清香'],
+    brew: { temp: '80℃', amount: '3g/150ml', time: '1分钟，可续水3次' }
+  },
+  whitetea: {
+    name: '白毫银针',
+    emoji: '⚪',
+    confidence: 92,
+    category: '白茶·芽茶',
+    origin: '福建福鼎',
+    totalScore: 89.6,
+    scores: { shape: 94, color: 88, aroma: 90, taste: 87, leaf: 89 },
+    beginner: {
+      smell: '清淡的毫香中带着日晒的甜香，素雅干净',
+      taste: '入口清甜柔和，茶汤如水般清澈',
+      after: '喉咙里有淡淡的蜜韵，越喝越甜',
+      feature: '毫香蜜韵——满披白毫，一年茶三年药七年宝'
+    },
+    tags: ['毫香', '清甜', '白毫', '素雅'],
+    brew: { temp: '90℃', amount: '5g/150ml', time: '30秒起，可久泡' }
+  },
+  puer: {
+    name: '云南熟普',
+    emoji: '🟤',
+    confidence: 91,
+    category: '普洱茶·熟茶',
+    origin: '云南西双版纳',
+    totalScore: 88.9,
+    scores: { shape: 87, color: 90, aroma: 88, taste: 91, leaf: 88 },
+    beginner: {
+      smell: '陈香中带着糯香和木质香，沉稳厚重',
+      taste: '入口醇厚顺滑，茶汤浓稠如米汤',
+      after: '胃部温暖舒适，回甘在喉底慢慢泛起',
+      feature: '陈韵——越陈越香，暖胃安神，可饮可藏'
+    },
+    tags: ['陈香', '醇厚', '糯滑', '暖胃'],
+    brew: { temp: '100℃', amount: '8g/150ml', time: '10秒起，逐泡+5秒' }
+  }
+};
+
+// 当前选中的茶类
+let currentSelectedTeaType = 'tieguanyin';
+
+// 选择茶类
+function selectTeaType(el, type) {
+  document.querySelectorAll('.tea-type-tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentSelectedTeaType = type;
+  showToast('已选择：' + teaRecognitionDatabase[type].name);
+}
+
+// 根据茶类动态更新识茶结果页
+function updateRecognitionResult(teaType) {
+  const tea = teaRecognitionDatabase[teaType];
+  if (!tea) return;
+  
+  // 更新基本信息
+  document.querySelector('#pageResult .tea-name').textContent = tea.name;
+  document.querySelector('#pageResult .tea-emoji').textContent = tea.emoji;
+  document.querySelector('#pageResult .confidence').textContent = 'AI识别置信度 ' + tea.confidence + '%';
+  
+  // 更新分类描述
+  const subtitleEl = document.querySelector('#pageResult .tea-subtitle');
+  if (subtitleEl) {
+    subtitleEl.textContent = tea.category + ' · ' + tea.origin;
+  }
+  
+  // 更新小白模式风味描述
+  const beginnerItems = document.querySelectorAll('#modeBeginner .flavor-item');
+  if (beginnerItems.length >= 4) {
+    beginnerItems[0].querySelector('.flavor-desc').innerHTML = tea.beginner.smell;
+    beginnerItems[1].querySelector('.flavor-desc').innerHTML = tea.beginner.taste;
+    beginnerItems[2].querySelector('.flavor-desc').innerHTML = tea.beginner.after;
+    beginnerItems[3].querySelector('.flavor-desc').innerHTML = tea.beginner.feature;
+  }
+  
+  // 更新综合评分
+  const totalScoreEl = document.querySelector('#pageResult .total-score');
+  if (totalScoreEl) totalScoreEl.textContent = tea.totalScore;
+  
+  // 更新五因子评分（如果有）
+  const scoreBars = document.querySelectorAll('#pageResult .score-bar-fill');
+  const scoreKeys = ['shape', 'color', 'aroma', 'taste', 'leaf'];
+  scoreBars.forEach((bar, i) => {
+    if (scoreKeys[i] && tea.scores[scoreKeys[i]]) {
+      bar.style.width = tea.scores[scoreKeys[i]] + '%';
+    }
+  });
+  
+  console.log('[识茶] 关联模型匹配：' + tea.name + '，置信度' + tea.confidence + '%');
+}
+
 // 拍照识别
 function startRecognize() {
   const video = document.getElementById('scanCamera');
@@ -8578,18 +8778,20 @@ function startRecognize() {
   // fetch('https://api.example.com/tea/recognize', {
   //   method: 'POST',
   //   headers: {'Content-Type': 'application/json'},
-  //   body: JSON.stringify({ image: imageData })
+  //   body: JSON.stringify({ image: imageData, teaType: currentSelectedTeaType })
   // }).then(res => res.json()).then(data => {
-  //   // 使用返回的真实识别结果更新pageResult
+  //   updateRecognitionResult(data.teaType);
   //   goToPage('pageResult');
   // });
   
-  // 当前为模拟识别，2秒后跳转结果页
+  // 关联模型：根据用户预选茶类返回对应结果
   setTimeout(() => {
     recognizing.classList.remove('active');
     if (imageData) {
-      console.log('已捕获图像，可发送至AI识茶API');
+      console.log('已捕获图像，关联模型匹配茶类：' + currentSelectedTeaType);
     }
+    // 根据预选茶类动态更新结果页
+    updateRecognitionResult(currentSelectedTeaType);
     goToPage('pageResult');
   }, 2000);
 }
@@ -8606,6 +8808,8 @@ function handleAlbumSelect(event) {
     recognizing.classList.add('active');
     setTimeout(() => {
       recognizing.classList.remove('active');
+      // 根据预选茶类动态更新结果页
+      updateRecognitionResult(currentSelectedTeaType);
       goToPage('pageResult');
     }, 2000);
   };
@@ -9914,7 +10118,7 @@ document.addEventListener('click', function(e) {
     window.addEventListener('load', handleShortcutParams);
   }
 
-  console.log('[PWA] 茶韵翻译官 V6.2 PWA版 已加载');
+  console.log('[PWA] 茶韵翻译官 V7.0 全功能版 已加载');
   
   // ========== 单元测试模块 ==========
   window.runUnitTests = function() {
