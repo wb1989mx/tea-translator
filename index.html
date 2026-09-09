@@ -2777,64 +2777,90 @@ body {
 }
 .timer-controls {
   display: flex;
-  gap: 14px;
+  gap: 10px;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   position: relative;
 }
 .timer-btn {
-  padding: 14px 22px;
+  flex: 1;
+  max-width: 100px;
+  padding: 12px 8px;
   border: none;
-  border-radius: 14px;
+  border-radius: 12px;
   background: rgba(255,255,255,0.12);
   color: #fff;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', sans-serif;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.15s ease;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  min-width: 80px;
   justify-content: center;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.1);
+  gap: 2px;
+  -webkit-tap-highlight-color: transparent;
 }
 .timer-btn:active {
-  transform: scale(0.96);
-  background: rgba(255,255,255,0.2);
+  transform: scale(0.94);
+  opacity: 0.8;
+}
+.timer-btn-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+.timer-btn-text {
+  font-size: 12px;
+  opacity: 0.9;
 }
 .timer-btn.primary {
-  background: linear-gradient(135deg, #d4a017, #e8b820);
-  font-weight: 700;
-  font-size: 16px;
-  min-width: 110px;
-  box-shadow: 0 4px 12px rgba(212, 160, 23, 0.4);
-  color: #1a3d2a;
+  background: #34C759;
+  font-weight: 600;
+  max-width: 120px;
+  box-shadow: 0 2px 8px rgba(52, 199, 89, 0.35);
 }
 .timer-btn.primary:active {
-  box-shadow: 0 2px 6px rgba(212, 160, 23, 0.3);
+  background: #2db84e;
+  box-shadow: 0 1px 4px rgba(52, 199, 89, 0.3);
 }
 .timer-btn.reset {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 59, 48, 0.15);
+  border: 1px solid rgba(255, 59, 48, 0.3);
+}
+.timer-btn.reset:active {
+  background: rgba(255, 59, 48, 0.25);
+}
+.timer-btn.next {
+  background: rgba(0, 122, 255, 0.15);
+  border: 1px solid rgba(0, 122, 255, 0.3);
+}
+.timer-btn.next:active {
+  background: rgba(0, 122, 255, 0.25);
 }
 .timer-presets {
   display: flex;
-  gap: 10px;
+  gap: 6px;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 .preset-btn {
-  padding: 10px 18px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 10px;
-  font-size: 13px;
+  flex: 1;
+  padding: 8px 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', sans-serif;
   cursor: pointer;
-  transition: all 0.2s;
-  border: 1px solid rgba(255,255,255,0.08);
-  min-width: 56px;
+  transition: all 0.15s ease;
   text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.preset-btn:active {
+  background: rgba(255,255,255,0.18);
+  transform: scale(0.94);
 }
 .preset-btn:active {
   transform: scale(0.95);
@@ -7149,16 +7175,16 @@ input, textarea { font-size: 16px !important; } /* 防止iOS自动缩放 */
                 </div>
                 <div class="timer-controls">
                   <button class="timer-btn reset" onclick="resetTimer()">
-                    🔄 重置
+                    <span class="timer-btn-icon">🔄</span>
+                    <span class="timer-btn-text">重置</span>
                   </button>
                   <button class="timer-btn primary" id="timerStartBtn" onclick="toggleTimer()">
-                    ▶️ 开始
+                    <span class="timer-btn-icon">▶️</span>
+                    <span class="timer-btn-text">开始</span>
                   </button>
-                  <button class="timer-btn" onclick="nextBrew()" style="background:#e8f5e9;color:#2d5a3d;">
-                    ⏭️ 下一泡
-                  </button>
-                  <button class="timer-btn" onclick="addTime()">
-                    ⏱️ +10s
+                  <button class="timer-btn next" onclick="nextBrew()">
+                    <span class="timer-btn-icon">⏭️</span>
+                    <span class="timer-btn-text">下一泡</span>
                   </button>
                 </div>
                 <div class="timer-presets">
@@ -7166,7 +7192,7 @@ input, textarea { font-size: 16px !important; } /* 防止iOS自动缩放 */
                   <div class="preset-btn" onclick="setTimer(10)">10秒</div>
                   <div class="preset-btn" onclick="setTimer(15)">15秒</div>
                   <div class="preset-btn" onclick="setTimer(30)">30秒</div>
-                  <div class="preset-btn" onclick="setTimer(60)">1分钟</div>
+                  <div class="preset-btn" onclick="setTimer(60)">1分</div>
                 </div>
               </div>
             </div>
@@ -9732,14 +9758,14 @@ function toggleTimer() {
     // 暂停
     clearInterval(timerInterval);
     timerRunning = false;
-    btn.innerHTML = '<span>▶️</span> 继续';
+    btn.innerHTML = '<span class="timer-btn-icon">▶️</span><span class="timer-btn-text">继续</span>';
   } else {
     // 开始
     if (timerSeconds <= 0) {
       timerSeconds = timerTotal;
     }
     timerRunning = true;
-    btn.innerHTML = '<span>⏸️</span> 暂停';
+    btn.innerHTML = '<span class="timer-btn-icon">⏸️</span><span class="timer-btn-text">暂停</span>';
     
     timerInterval = setInterval(() => {
       timerSeconds--;
@@ -9748,7 +9774,7 @@ function toggleTimer() {
       if (timerSeconds <= 0) {
         clearInterval(timerInterval);
         timerRunning = false;
-        btn.innerHTML = '<span>▶️</span> 开始';
+        btn.innerHTML = '<span class="timer-btn-icon">▶️</span><span class="timer-btn-text">开始</span>';
         showToast('⏰ 时间到！可以出汤了');
         // 声音提醒
         playTimerSound();
@@ -9766,7 +9792,7 @@ function resetTimer() {
   timerRunning = false;
   timerSeconds = timerTotal;
   updateTimerDisplay();
-  document.getElementById('timerStartBtn').innerHTML = '<span>▶️</span> 开始';
+  document.getElementById('timerStartBtn').innerHTML = '<span class="timer-btn-icon">▶️</span><span class="timer-btn-text">开始</span>';
 }
 
 // 计时器声音提醒（Web Audio API）
@@ -9797,7 +9823,7 @@ function setTimer(seconds) {
   timerTotal = seconds;
   timerSeconds = seconds;
   updateTimerDisplay();
-  document.getElementById('timerStartBtn').innerHTML = '<span>▶️</span> 开始';
+  document.getElementById('timerStartBtn').innerHTML = '<span class="timer-btn-icon">▶️</span><span class="timer-btn-text">开始</span>';
 }
 
 function addTime() {
