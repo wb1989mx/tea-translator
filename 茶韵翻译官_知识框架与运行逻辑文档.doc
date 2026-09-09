@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="utf-8">
+<title>茶韵翻译官小程序 V6.2 知识框架与运行逻辑文档</title>
+<!--[if gte mso 9]>
+<xml>
+<w:WordDocument>
+<w:View>Print</w:View>
+<w:Zoom>100</w:Zoom>
+</w:WordDocument>
+</xml>
+<![endif]-->
+<style>
+body { font-family: "微软雅黑", "Microsoft YaHei", sans-serif; font-size: 11pt; line-height: 1.8; color: #333; }
+h1 { font-size: 22pt; color: #2d5a3d; text-align: center; border-bottom: 3px solid #2d5a3d; padding-bottom: 10px; margin-top: 30px; }
+h2 { font-size: 16pt; color: #2d5a3d; border-left: 5px solid #5a9a6d; padding-left: 12px; margin-top: 25px; background: #f5f9f6; padding: 8px 12px; }
+h3 { font-size: 13pt; color: #3d7a4d; margin-top: 18px; border-bottom: 1px dashed #c5d8c9; padding-bottom: 5px; }
+h4 { font-size: 11.5pt; color: #5a9a6d; margin-top: 12px; }
+table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+th { background: #2d5a3d; color: white; padding: 8px; border: 1px solid #2d5a3d; text-align: left; }
+td { padding: 8px; border: 1px solid #c5d8c9; vertical-align: top; }
+tr:nth-child(even) { background: #f9fbf9; }
+code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace; font-size: 10pt; color: #c7254e; }
+.highlight { background: #fff8e1; padding: 10px 15px; border-left: 4px solid #d4a017; margin: 10px 0; }
+.toc { background: #f5f9f6; padding: 15px 25px; border-radius: 8px; margin: 20px 0; }
+.toc a { color: #2d5a3d; text-decoration: none; }
+.toc li { margin: 5px 0; }
+.page-break { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<h1>茶韵翻译官小程序 V6.2<br>知识框架与运行逻辑文档</h1>
+
+<div style="text-align: center; color: #666; margin: 20px 0;">
+版本：V6.2 雷达图优化版 + PWA改造 + 功能完善版<br>
+文档日期：2026年9月9日<br>
+项目路径：D:\茶学科研\tea-translator-pwa\
+</div>
+
+<div class="toc">
+<h3 style="border:none; margin-top:0;">目录</h3>
+<ol>
+<li><a href="#sec1">产品概述</a></li>
+<li><a href="#sec2">技术架构</a></li>
+<li><a href="#sec3">页面结构详解（32个页面）</a></li>
+<li><a href="#sec4">知识框架与数据结构</a></li>
+<li><a href="#sec5">核心功能运行逻辑</a></li>
+<li><a href="#sec6">PWA架构与离线能力</a></li>
+<li><a href="#sec7">状态管理与数据流</a></li>
+<li><a href="#sec8">扩展与维护建议</a></li>
+</ol>
+</div>
+
+<div class="page-break"></div>
+<h2 id="sec1">一、产品概述</h2>
+
+<h3>1.1 产品定位</h3>
+<p>茶韵翻译官是一款面向茶叶爱好者的移动端Web应用（PWA），核心价值是"秒懂一杯茶，从入门到精通"。产品通过AI识茶、风味词典、冲泡指南、品鉴日记、口味测试等功能，帮助用户建立从认知到品鉴的完整茶知识体系。</p>
+
+<h3>1.2 目标用户</h3>
+<table>
+<tr><th>用户分层</th><th>特征</th><th>核心需求</th></tr>
+<tr><td>新手用户</td><td>刚接触茶，不懂术语</td><td>简化版首页、基础科普、循序渐进</td></tr>
+<tr><td>进阶用户</td><td>喝了一段时间茶</td><td>完整功能、专业工具、深度体验</td></tr>
+<tr><td>资深茶友</td><td>乌龙茶事业部从业者</td><td>对比品鉴、专业审评、数据记录</td></tr>
+</table>
+
+<h3>1.3 核心功能矩阵</h3>
+<table>
+<tr><th>功能模块</th><th>子功能</th><th>优先级</th></tr>
+<tr><td rowspan="3">识茶工具</td><td>拍照识茶（真实相机调用）</td><td>P0</td></tr>
+<tr><td>相册选图识别</td><td>P0</td></tr>
+<tr><td>闪光灯切换</td><td>P0</td></tr>
+<tr><td rowspan="3">知识学习</td><td>风味词典（46词条，9大分类）</td><td>P0</td></tr>
+<tr><td>茶学院（4门课程，动态详情）</td><td>P0</td></tr>
+<tr><td>口味测试（4种人格类型）</td><td>P0</td></tr>
+<tr><td rowspan="3">冲泡工具</td><td>六大茶类冲泡指南</td><td>P0</td></tr>
+<tr><td>冲泡计时器（声音+震动提醒）</td><td>P0</td></tr>
+<tr><td>下一泡自动递增</td><td>P2</td></tr>
+<tr><td rowspan="4">品鉴记录</td><td>快速记录（感官类比）</td><td>P0</td></tr>
+<tr><td>品鉴日记（增删改查）</td><td>P0</td></tr>
+<tr><td>对比品鉴（双茶五因子对比）</td><td>P0</td></tr>
+<tr><td>场景模板（4种场景）</td><td>P0</td></tr>
+<tr><td rowspan="3">社交互动</td><td>茶友动态+评论</td><td>P0</td></tr>
+<tr><td>PK排行榜</td><td>P0</td></tr>
+<tr><td>分享卡片生成</td><td>P0</td></tr>
+</table>
+
+<div class="page-break"></div>
+<h2 id="sec2">二、技术架构</h2>
+
+<h3>2.1 技术栈</h3>
+<table>
+<tr><th>层级</th><th>技术</th><th>说明</th></tr>
+<tr><td>前端框架</td><td>原生HTML/CSS/JS</td><td>单文件应用，无框架依赖，加载快</td></tr>
+<tr><td>样式方案</td><td>内联CSS + 类名样式</td><td>移动端优先，100dvh适配软键盘</td></tr>
+<tr><td>PWA</td><td>Service Worker + Manifest</td><td>离线缓存、可安装到桌面</td></tr>
+<tr><td>相机API</td><td>getUserMedia</td><td>调用后置摄像头，需HTTPS/localhost</td></tr>
+<tr><td>音频API</td><td>Web Audio API</td><td>计时器提示音，无需外部音频文件</td></tr>
+<tr><td>震动API</td><td>navigator.vibrate</td><td>移动端震动反馈</td></tr>
+<tr><td>部署</td><td>GitHub Pages / Vercel / Netlify</td><td>静态托管，HTTPS自动支持</td></tr>
+</table>
+
+<h3>2.2 文件结构</h3>
+<table>
+<tr><th>文件</th><th>大小</th><th>作用</th></tr>
+<tr><td>index.html</td><td>~380KB</td><td>主应用文件，包含全部HTML/CSS/JS</td></tr>
+<tr><td>manifest.json</td><td>~1KB</td><td>PWA应用清单，名称/图标/主题色</td></tr>
+<tr><td>sw.js</td><td>~2KB</td><td>Service Worker，Cache First策略</td></tr>
+<tr><td>icons/icon-192.png</td><td>-</td><td>PWA图标192px</td></tr>
+<tr><td>icons/icon-512.png</td><td>-</td><td>PWA图标512px</td></tr>
+<tr><td>README.md</td><td>-</td><td>项目说明与部署指南</td></tr>
+<tr><td>deploy.ps1</td><td>-</td><td>一键部署到GitHub Pages脚本</td></tr>
+</table>
+
+<h3>2.3 设计规范</h3>
+<ul>
+<li><strong>主色调</strong>：深绿 #2d5a3d（品牌色）、中绿 #5a9a6d、浅绿 #e8f5e9</li>
+<li><strong>强调色</strong>：金色 #d4a017（评分/进度/VIP）</li>
+<li><strong>触摸热区</strong>：最小44x44pt（符合苹果HIG标准）</li>
+<li><strong>视口适配</strong>：100dvh动态视口高度，软键盘弹出不挤压</li>
+<li><strong>字体</strong>：系统默认字体栈，中文优先微软雅黑</li>
+</ul>
+
+<div class="page-break"></div>
+<h2 id="sec3">三、页面结构详解（32个页面）</h2>
+
+<h3>3.1 页面导航机制</h3>
+<p>所有页面通过 <code>goToPage(pageId)</code> 函数切换，使用 <code>pageHistory</code> 数组记录导航历史，<code>goBack()</code> 实现返回。当前活动页面通过添加 <code>active</code> class显示。</p>
+
+<div class="highlight">
+<strong>核心导航代码：</strong><br>
+<code>goToPage(pageId)</code> — 离开拍照页时自动关闭相机，进入拍照页时自动启动相机<br>
+<code>goBack()</code> — 从pageHistory弹出上一页<br>
+<code>switchTab(tab)</code> — 底部Tab切换（首页/发现/茶友/我的）
+</div>
+
+<h3>3.2 页面清单</h3>
+<table>
+<tr><th>序号</th><th>页面ID</th><th>页面名称</th><th>核心功能</th></tr>
+<tr><td>1</td><td>pageOnboarding</td><td>新手引导页</td><td>选择新手/有经验模式，跳过直接进入</td></tr>
+<tr><td>2</td><td>pageHome</td><td>首页</td><td>搜索、拍照识茶入口、今日宜喝、常用工具、每日任务</td></tr>
+<tr><td>3</td><td>pageScan</td><td>拍照识茶页</td><td>真实相机调用、闪光灯、相册选图、识别动画</td></tr>
+<tr><td>4</td><td>pageResult</td><td>识茶结果页</td><td>茶叶详情、五因子评分、雷达图、逐泡数据、匹配分析</td></tr>
+<tr><td>5</td><td>pageDict</td><td>风味词典</td><td>46词条搜索/分类筛选/收藏/展开详情</td></tr>
+<tr><td>6</td><td>pageDiary</td><td>品鉴日记列表</td><td>日记列表、筛选、统计数据</td></tr>
+<tr><td>7</td><td>pageDiaryDetail</td><td>日记详情</td><td>完整品鉴记录、编辑/删除按钮</td></tr>
+<tr><td>8</td><td>pageTeaManager</td><td>茶叶管家</td><td>存茶管理、转化预期、存茶知识</td></tr>
+<tr><td>9</td><td>pageDiscover</td><td>发现页</td><td>茶学院入口、茶知识文章、节气推荐</td></tr>
+<tr><td>10</td><td>pageSocial</td><td>茶友动态</td><td>动态列表、点赞、评论发布</td></tr>
+<tr><td>11</td><td>pageProfile</td><td>我的页面</td><td>用户信息、口味画像、成就、会员、附近门店</td></tr>
+<tr><td>12</td><td>pageTest</td><td>口味测试</td><td>5道题，4选项，记录答案计算人格</td></tr>
+<tr><td>13</td><td>pageTestResult</td><td>测试结果</td><td>4种人格类型动态展示、推荐茶品</td></tr>
+<tr><td>14</td><td>pageQuickRecord</td><td>快速记录</td><td>感官类比表达器，3步生成品鉴记录</td></tr>
+<tr><td>15</td><td>pageSceneTemplate</td><td>场景模板</td><td>4种场景（聚会/开箱/对比/状态）</td></tr>
+<tr><td>16</td><td>pageGuideRecord</td><td>引导式记录</td><td>香气/滋味/体感分步引导</td></tr>
+<tr><td>17</td><td>pageAddDiary</td><td>添加日记</td><td>完整表单，五因子评分滑块</td></tr>
+<tr><td>18</td><td>pageCompare</td><td>对比品鉴</td><td>双茶五因子并排对比、雷达图、结论</td></tr>
+<tr><td>19</td><td>pageStoreDetail</td><td>门店详情</td><td>门店信息、扫码打卡/免费品鉴/专属优惠</td></tr>
+<tr><td>20</td><td>pageRanking</td><td>排行榜</td><td>前三名领奖台、完整榜单、我的排名</td></tr>
+<tr><td>21</td><td>pageMoreTools</td><td>更多工具</td><td>16个工具分类展示</td></tr>
+<tr><td>22</td><td>pageShare</td><td>分享卡片</td><td>3种主题切换、文案生成</td></tr>
+<tr><td>23</td><td>pageBrew</td><td>冲泡指南</td><td>6种茶类切换、计时器、冲泡步骤</td></tr>
+<tr><td>24</td><td>pageCollege</td><td>茶学院</td><td>4门课程列表、学习进度</td></tr>
+<tr><td>25</td><td>pageAnnualReport</td><td>年度茶报</td><td>年度饮茶数据总结</td></tr>
+<tr><td>26</td><td>pageTasteEvolution</td><td>口味进化史</td><td>口味偏好变化追踪</td></tr>
+<tr><td>27</td><td>pageCourseDetail</td><td>课程详情</td><td>动态课程大纲、学习进度</td></tr>
+<tr><td>28</td><td>pageTeaDetail</td><td>茶叶详情</td><td>茶叶百科详情页</td></tr>
+<tr><td>29</td><td>pageLuck</td><td>今日茶运</td><td>每日运势+宜品茶推荐</td></tr>
+<tr><td>30</td><td>pageStores</td><td>附近门店</td><td>门店列表、距离、营业状态</td></tr>
+<tr><td>31</td><td>pageMember</td><td>会员中心</td><td>会员权益、积分、等级</td></tr>
+<tr><td>32</td><td>pageArticle</td><td>文章详情</td><td>茶知识文章阅读页</td></tr>
+</table>
+
+<div class="page-break"></div>
+<h2 id="sec4">四、知识框架与数据结构</h2>
+
+<h3>4.1 风味词典数据</h3>
+<p>共46个词条，按9大分类组织，每个词条包含：术语名、难度标签（入门/进阶/专业）、通俗解释、专业解释、形成原因、品鉴要点、代表茶品。</p>
+
+<h4>9大分类映射</h4>
+<table>
+<tr><th>分类</th><th>关键词</th><th>代表词条</th></tr>
+<tr><td>香气 aroma</td><td>兰花香、桂花香、蜜香、果香、陈香、火香、挂杯香、清香、浓香</td><td>兰花香、蜜香、果香</td></tr>
+<tr><td>滋味 taste</td><td>回甘、生津、醇厚、鲜爽、苦涩、收敛感、层次感、饱满度</td><td>回甘、醇厚、鲜爽</td></tr>
+<tr><td>喉韵 throat</td><td>喉韵、喉底回甘、清凉感、锁喉、挂喉</td><td>喉韵、清凉感</td></tr>
+<tr><td>体感 body</td><td>茶气、体感、打嗝、发热、生津感</td><td>茶气、体感</td></tr>
+<tr><td>外形 appearance</td><td>条索、砂绿、蜻蜓头、蛤蟆腿、嫩度</td><td>砂绿、蜻蜓头</td></tr>
+<tr><td>汤色 color</td><td>金黄、橙黄、清澈、明亮、红艳</td><td>金黄明亮</td></tr>
+<tr><td>工艺 process</td><td>摇青、做青、杀青、揉捻、烘焙、发酵、走水</td><td>摇青、做青</td></tr>
+<tr><td>韵味 charm</td><td>观音韵、岩韵、丛韵、山场味、地域香</td><td>观音韵、岩韵</td></tr>
+<tr><td>其他</td><td>耐泡度、叶底、杯底香、冷香、暖香</td><td>耐泡度、叶底</td></tr>
+</table>
+
+<h3>4.2 冲泡参数数据</h3>
+<p>支持六大茶类，每类包含：水温、投茶量、首泡时间、耐泡度、冲泡步骤时间线。</p>
+<table>
+<tr><th>茶类</th><th>水温</th><th>投茶量</th><th>首泡</th><th>耐泡度</th><th>递增秒数</th></tr>
+<tr><td>铁观音</td><td>100℃</td><td>7g/110ml</td><td>10秒</td><td>7泡</td><td>+5秒/泡</td></tr>
+<tr><td>岩茶</td><td>100℃</td><td>8g/110ml</td><td>10秒</td><td>8泡</td><td>+5秒/泡</td></tr>
+<tr><td>红茶</td><td>90-95℃</td><td>5g/150ml</td><td>30秒</td><td>5泡</td><td>+10秒/泡</td></tr>
+<tr><td>龙井</td><td>80℃</td><td>3g/150ml</td><td>2分钟</td><td>3泡</td><td>+30秒/泡</td></tr>
+<tr><td>白茶</td><td>90-100℃</td><td>5g/150ml</td><td>30秒</td><td>10泡</td><td>+10秒/泡</td></tr>
+<tr><td>普洱</td><td>100℃</td><td>8g/110ml</td><td>15秒</td><td>15泡</td><td>+5秒/泡</td></tr>
+</table>
+
+<h3>4.3 识茶结果数据</h3>
+<p>以"安溪铁观音·特级"为示例数据，包含：</p>
+<ul>
+<li><strong>基本信息</strong>：茶名、置信度96%、综合评分92.4分</li>
+<li><strong>国标五因子</strong>：外形20%、汤色5%、香气30%、滋味35%、叶底10%</li>
+<li><strong>逐泡数据</strong>：第1-7泡的香气/滋味/回甘评分，第3泡96分为最佳</li>
+<li><strong>风味雷达图</strong>：香气95、滋味90、回甘92、生津88、喉韵85、耐泡度93</li>
+<li><strong>同级对比基线</strong>：与市场同级产品对比</li>
+</ul>
+
+<h3>4.4 口味测试人格模型</h3>
+<p>4种人格类型，每道题4个选项分别对应一种人格，统计最高得分为最终结果。</p>
+<table>
+<tr><th>人格类型</th><th>特征</th><th>推荐茶</th><th>标签</th></tr>
+<tr><td>🌸 兰花香型</td><td>清雅细腻、追求品质</td><td>铁观音、鸭屎香、武夷水仙</td><td>兰花香爱好者、喜欢回甘、中度发酵</td></tr>
+<tr><td>🍑 果香型</td><td>香甜活泼、热爱生活</td><td>金骏眉、蜜兰香、正山小种</td><td>果香爱好者、喜欢鲜甜、轻发酵</td></tr>
+<tr><td>🔥 火香型</td><td>醇厚温暖、沉稳内涵</td><td>武夷肉桂、熟普、浓香铁观音</td><td>火香爱好者、喜欢醇厚、重发酵</td></tr>
+<tr><td>🌿 清雅型</td><td>清新自然、简单纯粹</td><td>西湖龙井、白毫银针、碧螺春</td><td>清香爱好者、喜欢鲜爽、不发酵</td></tr>
+</table>
+
+<h3>4.5 24节气推荐茶数据</h3>
+<p><code>solarTermTeas</code>数组包含24个节气，每个节气含：节气名、月份日期、推荐茶名、图标、水温、投茶量、首泡时间、推荐描述、推荐理由。根据当前日期自动匹配最近已过节气。</p>
+
+<h3>4.6 课程数据</h3>
+<p><code>courseData</code>对象包含4门课程，每门含：标题、副标题、课时数、总分钟数、难度、进度、课程介绍、头部背景色、课程大纲数组（每课含天数/标题/时间/状态）。</p>
+
+<div class="page-break"></div>
+<h2 id="sec5">五、核心功能运行逻辑</h2>
+
+<h3>5.1 拍照识茶流程</h3>
+<div class="highlight">
+<strong>完整流程：</strong><br>
+1. 用户点击"拍照识茶" → <code>goToPage('pageScan')</code><br>
+2. <code>goToPage</code>检测到目标是pageScan → 延迟300ms调用<code>initScanCamera()</code><br>
+3. <code>initScanCamera()</code>调用<code>getUserMedia({facingMode:'environment'})</code>启动后置摄像头<br>
+4. 成功：video显示实时画面，隐藏预览图<br>
+5. 失败（file://或非HTTPS）：显示"相机启动失败"toast，显示预览图<br>
+6. 用户点击拍照 → <code>startRecognize()</code><br>
+7. 如相机可用，canvas抓取当前帧；显示"识别中"动画<br>
+8. 2秒后跳转到<code>pageResult</code>识茶结果页<br>
+9. 离开拍照页时 → <code>stopScanCamera()</code>自动关闭摄像头释放资源
+</div>
+
+<h3>5.2 口味测试逻辑</h3>
+<div class="highlight">
+<strong>完整流程：</strong><br>
+1. 进入pageTest → <code>updateTestQuestion()</code>显示第1题<br>
+2. 用户选择选项 → <code>selectTestOption(index)</code><br>
+3. 保存答案到<code>testAnswers</code>数组（记录对应人格类型）<br>
+4. 300ms后切换下一题或结束<br>
+5. 5题答完 → <code>calculatePersonality()</code><br>
+6. 统计4种人格的得分，取最高分<br>
+7. <code>updateTestResult(type)</code>动态更新结果页（表情/标题/描述/标签/推荐茶/理由）<br>
+8. 跳转pageTestResult，重置testAnswers
+</div>
+
+<h3>5.3 冲泡计时器逻辑</h3>
+<div class="highlight">
+<strong>核心变量：</strong><code>timerSeconds</code>（当前秒数）、<code>timerTotal</code>（总秒数）、<code>timerRunning</code>（运行状态）、<code>currentBrewNumber</code>（当前泡数）、<code>currentBrewIncrement</code>（每泡递增秒数）<br><br>
+<strong>计时结束触发：</strong><br>
+1. <code>clearInterval</code>停止计时<br>
+2. 按钮变回"开始"<br>
+3. <code>showToast('⏰ 时间到！可以出汤了')</code><br>
+4. <code>playTimerSound()</code> → Web Audio API播放三声880Hz提示音<br>
+5. <code>navigator.vibrate([200,100,200,100,200])</code>震动（移动端）<br><br>
+<strong>下一泡逻辑：</strong><code>nextBrew()</code> → 泡数+1，时间+递增秒数，更新显示
+</div>
+
+<h3>5.4 风味词典逻辑</h3>
+<ul>
+<li><strong>展开/收起</strong>：<code>toggleDict(item)</code>切换expanded class，展开时动态注入收藏按钮</li>
+<li><strong>搜索</strong>：<code>searchDict(keyword)</code>实时过滤词条，匹配术语名和解释</li>
+<li><strong>分类筛选</strong>：<code>switchDictCategory()</code>按9大分类过滤</li>
+<li><strong>收藏</strong>：<code>toggleFavorite()</code>用Set存储收藏词条，<code>filterFavorites()</code>筛选显示</li>
+</ul>
+
+<h3>5.5 品鉴日记逻辑</h3>
+<ul>
+<li><strong>添加</strong>：<code>saveDiary()</code>保存表单数据（五因子评分+感官标签+文字记录）</li>
+<li><strong>编辑</strong>：<code>editDiary()</code>进入编辑模式，预填原有数据</li>
+<li><strong>删除</strong>：<code>deleteDiary()</code>确认后删除记录</li>
+<li><strong>快速记录</strong>：<code>saveQuickRecord()</code>通过感官类比（像什么味道/感觉）3步生成记录</li>
+<li><strong>AI结构化</strong>：<code>aiStructurize()</code>将口语化描述转为专业品鉴术语</li>
+</ul>
+
+<h3>5.6 对比品鉴逻辑</h3>
+<p><code>pageCompare</code>页面展示两款茶的五因子并排条形图对比、综合评分对比、风味标签对比、品鉴结论。数据为预设示例（铁观音vs肉桂），可扩展为用户选择任意两款茶对比。</p>
+
+<h3>5.7 全局错误监控</h3>
+<p>页面注入<code>window.onerror</code>全局监听，捕获JS错误后通过toast提示，并可扩展为上报服务器。PWA的Service Worker也会缓存失败时给出离线提示。</p>
+
+<div class="page-break"></div>
+<h2 id="sec6">六、PWA架构与离线能力</h2>
+
+<h3>6.1 Manifest配置</h3>
+<table>
+<tr><th>字段</th><th>值</th><th>说明</th></tr>
+<tr><td>name</td><td>茶韵翻译官</td><td>应用全名</td></tr>
+<tr><td>short_name</td><td>茶韵</td><td>桌面图标名称</td></tr>
+<tr><td>start_url</td><td>/index.html</td><td>启动页</td></tr>
+<tr><td>display</td><td>standalone</td><td>独立应用模式（无浏览器地址栏）</td></tr>
+<tr><td>background_color</td><td>#2d5a3d</td><td>启动屏背景色</td></tr>
+<tr><td>theme_color</td><td>#2d5a3d</td><td>状态栏主题色</td></tr>
+<tr><td>icons</td><td>192px/512px</td><td>PWA安装图标</td></tr>
+</table>
+
+<h3>6.2 Service Worker缓存策略</h3>
+<div class="highlight">
+<strong>Cache First策略：</strong><br>
+1. 请求到达 → 先查缓存<br>
+2. 缓存命中 → 直接返回缓存（极速响应）<br>
+3. 缓存未命中 → 发起网络请求<br>
+4. 网络成功 → 存入缓存并返回<br>
+5. 网络失败 → 返回离线提示页<br><br>
+<strong>缓存版本管理：</strong><code>CACHE_NAME = 'tea-translator-v6-2-1'</code>，版本号更新时自动清除旧缓存
+</div>
+
+<h3>6.3 移动端适配要点</h3>
+<ul>
+<li><strong>软键盘适配</strong>：使用<code>100dvh</code>动态视口高度，软键盘弹出时页面自动收缩不挤压</li>
+<li><strong>触摸热区</strong>：所有可点击元素最小44x44pt</li>
+<li><strong>首屏loading</strong>：PWA安装/首次加载时显示品牌loading遮罩</li>
+<li><strong>相机权限</strong>：必须HTTPS或localhost环境，file://协议下相机不可用（正常限制）</li>
+</ul>
+
+<div class="page-break"></div>
+<h2 id="sec7">七、状态管理与数据流</h2>
+
+<h3>7.1 全局状态变量</h3>
+<table>
+<tr><th>变量</th><th>类型</th><th>作用</th></tr>
+<tr><td>currentPage</td><td>string</td><td>当前活动页面ID</td></tr>
+<tr><td>pageHistory</td><td>array</td><td>导航历史栈</td></tr>
+<tr><td>currentTestQuestion</td><td>number</td><td>口味测试当前题号</td></tr>
+<tr><td>testAnswers</td><td>array</td><td>口味测试答案记录</td></tr>
+<tr><td>timerSeconds/timerTotal</td><td>number</td><td>计时器当前/总秒数</td></tr>
+<tr><td>timerRunning</td><td>boolean</td><td>计时器运行状态</td></tr>
+<tr><td>currentBrewNumber</td><td>number</td><td>当前冲泡泡数</td></tr>
+<tr><td>scanCameraActive</td><td>boolean</td><td>相机激活状态</td></tr>
+<tr><td>flashOn</td><td>boolean</td><td>闪光灯状态</td></tr>
+<tr><td>favoriteTerms</td><td>Set</td><td>收藏的风味词条</td></tr>
+<tr><td>dailyTasks</td><td>object</td><td>每日任务完成状态</td></tr>
+</table>
+
+<h3>7.2 数据流方向</h3>
+<p>应用采用单向数据流：用户交互 → 事件处理函数 → 更新状态变量 → 操作DOM更新视图。无双向绑定框架，所有状态变更通过函数显式管理。</p>
+
+<h3>7.3 数据持久化</h3>
+<div class="highlight">
+<strong>当前状态：</strong>所有数据为内存态，刷新页面后重置（演示版本）<br><br>
+<strong>建议扩展：</strong><br>
+- 品鉴日记 → localStorage或IndexedDB<br>
+- 收藏词条 → localStorage<br>
+- 用户口味画像 → localStorage<br>
+- 学习进度 → localStorage<br>
+- 每日任务 → localStorage（按日期重置）
+</div>
+
+<div class="page-break"></div>
+<h2 id="sec8">八、扩展与维护建议</h2>
+
+<h3>8.1 近期可扩展功能</h3>
+<table>
+<tr><th>功能</th><th>优先级</th><th>实现难度</th><th>说明</th></tr>
+<tr><td>数据持久化</td><td>P0</td><td>低</td><td>localStorage保存日记/收藏/进度</td></tr>
+<tr><td>真实AI识茶</td><td>P1</td><td>高</td><td>接入茶叶图像识别API，替代模拟识别</td></tr>
+<tr><td>多茶品对比</td><td>P1</td><td>中</td><td>对比品鉴页支持用户选择任意两款茶</td></tr>
+<tr><td>品鉴数据统计</td><td>P1</td><td>中</td><td>基于日记数据生成个人口味画像变化</td></tr>
+<tr><td>社区内容UGC</td><td>P2</td><td>高</td><td>真实用户动态发布与互动</td></tr>
+<tr><td>茶具商城</td><td>P2</td><td>中</td><td>关联八马茶业电商</td></tr>
+</table>
+
+<h3>8.2 代码维护建议</h3>
+<ol>
+<li><strong>拆分文件</strong>：当前单文件380KB，建议拆分为HTML/CSS/JS三个文件，JS再按模块拆分（识茶/词典/计时器/测试等）</li>
+<li><strong>数据外置</strong>：将风味词典、冲泡参数、课程数据等抽为JSON文件，便于维护和扩展</li>
+<li><strong>组件化</strong>：课程卡片、日记卡片、茶品卡片等重复UI可封装为模板函数</li>
+<li><strong>单元测试</strong>：核心计算函数（人格计算、节气匹配、计时器）可添加测试用例</li>
+<li><strong>错误上报</strong>：全局window.onerror已埋点，建议接入Sentry等监控平台</li>
+</ol>
+
+<h3>8.3 部署注意事项</h3>
+<ul>
+<li><strong>必须HTTPS</strong>：相机API、Service Worker、PWA安装都要求HTTPS环境</li>
+<li><strong>GitHub Pages</strong>：仓库开启Pages后自动HTTPS，访问地址为 <code>https://用户名.github.io/仓库名/</code></li>
+<li><strong>缓存更新</strong>：修改代码后需更新sw.js的CACHE_NAME版本号，否则用户可能看到旧版本</li>
+<li><strong>iOS限制</strong>：iOS Safari的PWA安装需用户手动"添加到主屏幕"，震动API不支持</li>
+</ul>
+
+<hr>
+<div style="text-align: center; color: #999; margin-top: 30px; font-size: 10pt;">
+本文档由茶韵翻译官开发团队整理<br>
+如有疑问请联系：汶波（八马茶业乌龙茶事业部）
+</div>
+
+</body>
+</html>

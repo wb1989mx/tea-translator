@@ -1,0 +1,52 @@
+{
+  "name": "茶韵翻译官",
+  "short_name": "茶韵翻译",
+  "description": "用大白话翻译茶叶专业术语，拍照识茶、记录品鉴、找到适合你的茶",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f9f6",
+  "theme_color": "#2d5a3d",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "categories": ["lifestyle", "education", "food"],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "拍照识茶",
+      "short_name": "识茶",
+      "description": "快速打开拍照识茶功能",
+      "url": "./index.html?action=scan",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "快速记录",
+      "short_name": "记录",
+      "description": "30秒记录品茶感受",
+      "url": "./index.html?action=record",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "风味词典",
+      "short_name": "词典",
+      "description": "查阅茶叶专业术语",
+      "url": "./index.html?action=dict",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false
+}
