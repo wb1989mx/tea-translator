@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -5389,7 +5389,7 @@ input, textarea { font-size: 16px !important; } /* 防止iOS自动缩放 */
       </div>
 
       <!-- 茶叶管家页 -->
-      <div class="page" id="pageTeaManager">
+      <div class="page tea-manager-page" id="pageTeaManager">
         <div class="page-content">
           <div class="tea-manager-header">
             <div class="back-btn" style="width:36px;height:36px;background:rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;position:absolute;top:50px;left:20px;" onclick="goBack()">←</div>
@@ -7990,70 +7990,56 @@ input, textarea { font-size: 16px !important; } /* 防止iOS自动缩放 */
           </div>
           <div class="stores-list">
             <div class="store-card" onclick="goToPage('pageStoreDetail')">
-              <div class="store-card-top">
-                <div class="store-icon">🏪</div>
-                <div class="store-info">
-                  <div class="store-name">名茶体验馆·安溪万达店</div>
-                  <div class="store-distance">距您 1.2km</div>
-                </div>
+              <div class="store-img">🏪</div>
+              <div class="store-info">
+                <div class="store-name">名茶体验馆·安溪总店</div>
+                <div class="store-distance">📍 0.8km</div>
                 <div class="store-status">营业中</div>
               </div>
-              <div class="store-address">📍 泉州市安溪县万达广场一楼101号铺</div>
+              <div class="store-address">泉州市安溪县茶博汇1期A栋</div>
               <div class="store-benefits">
                 <div class="store-benefit">扫码打卡</div>
                 <div class="store-benefit">免费品鉴</div>
                 <div class="store-benefit">专属优惠</div>
               </div>
             </div>
-
             <div class="store-card" onclick="goToPage('pageStoreDetail')">
-              <div class="store-card-top">
-                <div class="store-icon">🏪</div>
-                <div class="store-info">
-                  <div class="store-name">天福茗茶·安溪茶都店</div>
-                  <div class="store-distance">距您 2.5km</div>
-                </div>
+              <div class="store-img">🏪</div>
+              <div class="store-info">
+                <div class="store-name">天福茗茶·安溪店</div>
+                <div class="store-distance">📍 1.2km</div>
                 <div class="store-status">营业中</div>
               </div>
-              <div class="store-address">📍 泉州市安溪县中国茶都二期B栋101号</div>
+              <div class="store-address">泉州市安溪县大同路168号</div>
               <div class="store-benefits">
-                <div class="store-benefit">扫码打卡</div>
-                <div class="store-benefit">免费品鉴</div>
-                <div class="store-benefit">专属优惠</div>
+                <div class="store-benefit">会员专享</div>
+                <div class="store-benefit">茶礼定制</div>
               </div>
             </div>
-
             <div class="store-card" onclick="goToPage('pageStoreDetail')">
-              <div class="store-card-top">
-                <div class="store-icon">🏪</div>
-                <div class="store-info">
-                  <div class="store-name">华祥苑·宝龙广场店</div>
-                  <div class="store-distance">距您 3.8km</div>
-                </div>
+              <div class="store-img">🏪</div>
+              <div class="store-info">
+                <div class="store-name">华祥苑·安溪茶都店</div>
+                <div class="store-distance">📍 2.5km</div>
                 <div class="store-status">营业中</div>
               </div>
-              <div class="store-address">📍 泉州市安溪县宝龙城市广场一楼</div>
+              <div class="store-address">泉州市安溪县茶都广场B区12号</div>
               <div class="store-benefits">
-                <div class="store-benefit">扫码打卡</div>
-                <div class="store-benefit">免费品鉴</div>
-                <div class="store-benefit">专属优惠</div>
+                <div class="store-benefit">新品试饮</div>
+                <div class="store-benefit">买二送一</div>
               </div>
             </div>
-
             <div class="store-card" onclick="goToPage('pageStoreDetail')">
-              <div class="store-card-top">
-                <div class="store-icon">🏪</div>
-                <div class="store-info">
-                  <div class="store-name">日春茶业·茶博汇店</div>
-                  <div class="store-distance">距您 5.2km</div>
-                </div>
+              <div class="store-img">🏪</div>
+              <div class="store-info">
+                <div class="store-name">日春茶业·安溪旗舰店</div>
+                <div class="store-distance">📍 3.1km</div>
                 <div class="store-status">营业中</div>
               </div>
-              <div class="store-address">📍 泉州市安溪县茶博汇1期A栋</div>
+              <div class="store-address">泉州市安溪县永安路99号</div>
               <div class="store-benefits">
-                <div class="store-benefit">扫码打卡</div>
-                <div class="store-benefit">免费品鉴</div>
-                <div class="store-benefit">专属优惠</div>
+                <div class="store-benefit">VIP包厢</div>
+                <div class="store-benefit">茶艺表演</div>
               </div>
             </div>
           </div>
@@ -8219,6 +8205,12 @@ input, textarea { font-size: 16px !important; } /* 防止iOS自动缩放 */
 </div>
 
 <script>
+// 全局错误处理
+window.onerror = function(msg, url, line, col, error) {
+  console.error('JS错误:', msg, '行:', line, '列:', col);
+  return false;
+};
+
 let currentPage = 'pageOnboarding';
 let currentTab = 'home';
 let pageHistory = [];
@@ -8421,12 +8413,23 @@ function showRadarDetail(dimension) {
 }
 
 function goToPage(pageId) {
+  var targetEl = document.getElementById(pageId);
+  if (!targetEl) {
+    console.error('goToPage: 找不到页面 ' + pageId);
+    return;
+  }
+  // 自动修复：确保页面在page-container内
+  var pageContainer = document.querySelector('.page-container');
+  if (targetEl.parentNode !== pageContainer && pageContainer) {
+    pageContainer.appendChild(targetEl);
+  }
   // 离开拍照页时关闭相机
   if (currentPage === 'pageScan') stopScanCamera();
   
   pageHistory.push(currentPage);
-  document.getElementById(currentPage).classList.remove('active');
-  document.getElementById(pageId).classList.add('active');
+  // 移除所有页面的active类，防止覆盖
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  targetEl.classList.add('active');
   currentPage = pageId;
   
   // 进入拍照页时启动相机
@@ -10190,5 +10193,7 @@ document.addEventListener('click', function(e) {
   };
 })();
 </script>
+  </div>
+</div>
 </body>
 </html>
